@@ -57,8 +57,8 @@ class Segment:
 
 class NewsProvider(ABC):
     record_url: str
-    record_start_minute = 58
-    record_duration = 6*60
+    record_start_minute = 57
+    record_duration = 7*60
 
     @abstractmethod
     def segments(self, recording_file: str) -> Iterator[Segment]:
@@ -72,13 +72,14 @@ class SublimeNewsProvider(NewsProvider):
         nieuws_start = find_offset(recording_file, 'fragments/sublime_nieuws.wav')
         weer_start = find_offset(recording_file, 'fragments/sublime_weer.wav')
         verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav')
-        eind = find_offset(recording_file, 'fragments/sublime_eind.wav')
+        eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav')
+        eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav')
 
-        # Voorbeeld werkdag om 12 uur 's middags:
-        # reclame - start - weer - verkeer - eind - reclame
+        # Voorbeeld werkdag overdag tijdens spits:
+        # reclame - start - weer - verkeer - eind_reclame - reclame
 
-        # Voorbeeld werkdag om 11 uur 's avonds:
-        # reclame - start - weer - alternatief eind
+        # Voorbeeld werkdag avond:
+        # (reclame -) start - weer - eind_nacht
 
         # Nieuws is altijd hetzelfde, van "En nu het nieuws" tot "Sublime weer"
         if nieuws_start and weer_start:
@@ -88,10 +89,12 @@ class SublimeNewsProvider(NewsProvider):
             # Tijdens de spits is er verkeersinformatie
             # Dan gaat weer tot "Sublime verkeer"
             if verkeer_start:
-                yield Segment(weer_start + 0.05, verkeer_start - 3.23)
+                yield Segment(weer_start + 0.05, verkeer_start - 1.75)
+            # anders gaat weer tot het eind
             elif eind:
-                # anders gaat verkeer tot het eind
-                yield Segment(weer_start + 0.05, eind)
+                yield Segment(weer_start + 0.05, eind - 1.35)
+            elif eind2:
+                yield Segment(weer_start + 0.05, eind2 - 5.3)
 
         # Eind is ook soms anders, dan maar geen weer. In ieder geval hebben we het nieuws.
 
@@ -201,7 +204,6 @@ class NewsScraper:
             #     continue
 
             if datetime.now().minute != self.provider.record_start_minute:
-                print('waiting to start recording')
                 time.sleep(30)
                 continue
 
