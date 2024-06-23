@@ -42,9 +42,9 @@ def find_offset(within_file, find_file):
     c = correlate(y_within, y_find)
     peak = np.argmax(c)
     offset = round(peak / sr_within, 2)
-    print(f'found {find_file} at {offset} with confidence {c[peak]}')
-    # seems to be >1000 for true positive >1000 and <300 for false positive
-    if c[peak] < 500:
+    confidence = (c[peak] / len(y_find)) * 100
+    print(f'found {find_file} at {offset} with confidence {confidence}')
+    if confidence < 1.0:
         return None
     return offset
 
@@ -74,12 +74,11 @@ class SublimeNewsProvider(NewsProvider):
         verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav')
         eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav')
         eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav')
+        eind3 = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
 
-        # Voorbeeld werkdag overdag tijdens spits:
-        # reclame - start - weer - verkeer - eind_reclame - reclame
-
-        # Voorbeeld werkdag avond:
-        # (reclame -) start - weer - eind_nacht
+        # Voorbeeld werkdag overdag tijdens spits: reclame - start - weer - verkeer - eind_reclame - reclame
+        # Voorbeeld werkdag avond                : (reclame -) start - weer - eind_nacht
+        # na "eind speciaal" volgt normaal gesproken iets als "sublime weekend" of "candy's world", maar heet eerste stukje lijkt altijd hetzelfde
 
         # Nieuws is altijd hetzelfde, van "En nu het nieuws" tot "Sublime weer"
         if nieuws_start and weer_start:
@@ -93,7 +92,9 @@ class SublimeNewsProvider(NewsProvider):
             # anders gaat weer tot het eind
             elif eind:
                 yield Segment(weer_start + 0.05, eind - 1.35)
-            elif eind2:
+            elif eind3:
+                yield Segment(weer_start + 0.05, eind3 - 3.5)
+            elif eind2: # eind2 heeft hogere kans op false positive dus moet als laatste gebruikt worden
                 yield Segment(weer_start + 0.05, eind2 - 5.3)
 
         # Eind is ook soms anders, dan maar geen weer. In ieder geval hebben we het nieuws.
