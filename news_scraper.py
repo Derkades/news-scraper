@@ -69,32 +69,38 @@ class SublimeNewsProvider(NewsProvider):
     record_url = 'https://22723.live.streamtheworld.com/SUBLIME.mp3'
 
     def segments(self, recording_file: str) -> Iterator[Segment]:
-        nieuws_start = find_offset(recording_file, 'fragments/sublime_nieuws.wav')
-        weer_start = find_offset(recording_file, 'fragments/sublime_weer.wav')
-        verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav')
-        eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav')
-        eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav')
-        eind3 = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
-
         # Voorbeeld werkdag overdag tijdens spits: reclame - start - weer - verkeer - eind_reclame - reclame
         # Voorbeeld werkdag avond                : (reclame -) start - weer - eind_nacht
         # na "eind speciaal" volgt normaal gesproken iets als "sublime weekend" of "candy's world", maar heet eerste stukje lijkt altijd hetzelfde
+
+        nieuws_start = find_offset(recording_file, 'fragments/sublime_nieuws.wav')
+        weer_start = find_offset(recording_file, 'fragments/sublime_weer.wav')
 
         # Nieuws is altijd hetzelfde, van "En nu het nieuws" tot "Sublime weer"
         if nieuws_start and weer_start:
             yield Segment(nieuws_start - 1.52, weer_start - 1.2)
 
         if weer_start:
+            verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav')
             # Tijdens de spits is er verkeersinformatie
             # Dan gaat weer tot "Sublime verkeer"
             if verkeer_start:
                 yield Segment(weer_start + 0.05, verkeer_start - 1.75)
-            # anders gaat weer tot het eind
-            elif eind:
+                return
+
+            # anders gaat weer tot het eind, maar welk eind?
+            eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav')
+            eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav') # hogere kans op verkeerde detectie dus moet als laatste gebruikt worden
+            eind3 = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
+            eind4 = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav')
+
+            if eind:
                 yield Segment(weer_start + 0.05, eind - 1.35)
             elif eind3:
                 yield Segment(weer_start + 0.05, eind3 - 3.5)
-            elif eind2: # eind2 heeft hogere kans op false positive dus moet als laatste gebruikt worden
+            elif eind4:
+                yield Segment(weer_start + 0.05, eind4 - 4.85)
+            elif eind2:
                 yield Segment(weer_start + 0.05, eind2 - 5.3)
 
         # Eind is ook soms anders, dan maar geen weer. In ieder geval hebben we het nieuws.
