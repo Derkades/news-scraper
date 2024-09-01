@@ -36,12 +36,13 @@ def read_wav(file_name):
     return audio_as_np_float32 / 2**15, ifile.getframerate()
 
 
-def find_offset(within_file, find_file):
+def find_offset(within_file, find_file, search_from = 0.0):
     y_within, sr_within = read_wav(within_file)
     y_find, _sr_find = read_wav(find_file)
+    y_within = y_within[int(search_from*sr_within):]
     c = correlate(y_within, y_find)
     peak = np.argmax(c)
-    offset = round(peak / sr_within, 2)
+    offset = round(peak / sr_within, 2) + search_from
     confidence = (c[peak] / len(y_find)) * 100
     print(f'found {find_file} at {offset} with confidence {confidence}')
     if confidence < 1.0:
@@ -89,7 +90,8 @@ class SublimeNewsProvider(NewsProvider):
                 return
 
             # anders gaat weer tot het eind, maar welk eind?
-            eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav')
+            # eind_reclame speelt soms ook voor het nieuws, dus zoek specifiek na het weer
+            eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav', search_from=weer_start)
             eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav') # hogere kans op verkeerde detectie dus moet als laatste gebruikt worden
             eind3 = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
             eind4 = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav')
