@@ -90,20 +90,28 @@ class SublimeNewsProvider(NewsProvider):
                 return
 
             # anders gaat weer tot het eind, maar welk eind?
-            # eind_reclame speelt soms ook voor het nieuws, dus zoek specifiek na het weer
-            eind = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav', search_from=weer_start)
-            eind2 = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav') # hogere kans op verkeerde detectie dus moet als laatste gebruikt worden
-            eind3 = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
-            eind4 = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav')
 
-            if eind:
-                yield Segment(weer_start + 0.05, eind - 1.35)
-            elif eind3:
-                yield Segment(weer_start + 0.05, eind3 - 3.5)
-            elif eind4:
-                yield Segment(weer_start + 0.05, eind4 - 4.85)
-            elif eind2:
-                yield Segment(weer_start + 0.05, eind2 - 5.3)
+            # eind_reclame speelt soms ook voor het nieuws, dus zoek specifiek na het weer
+            eind_reclame = find_offset(recording_file, 'fragments/sublime_eind_reclame.wav', search_from=weer_start)
+            if eind_reclame:
+                yield Segment(weer_start + 0.05, eind_reclame - 1.35)
+                return
+
+            eind_funky = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav')
+            if eind_funky:
+                yield Segment(weer_start + 0.05, eind_funky - 4.85)
+                return
+
+            eind_speciaal = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
+            if eind_speciaal:
+                yield Segment(weer_start + 0.05, eind_speciaal - 3.5)
+                return
+
+            # hogere kans op verkeerde detectie dus wordt als laatste geprobeerd
+            eind_nacht = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav')
+            if eind_nacht:
+                yield Segment(weer_start + 0.05, eind_nacht - 5.3)
+                return
 
         # Eind is ook soms anders, dan maar geen weer. In ieder geval hebben we het nieuws.
 
