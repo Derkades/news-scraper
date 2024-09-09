@@ -45,7 +45,7 @@ def find_offset(within_file, find_file, search_from = 0.0):
     offset = round(peak / sr_within, 2) + search_from
     confidence = (c[peak] / len(y_find)) * 100
     print(f'found {find_file} at {offset} with confidence {confidence}')
-    if confidence < 1.0:
+    if confidence < 0.8:
         return None
     return offset
 
@@ -75,14 +75,14 @@ class SublimeNewsProvider(NewsProvider):
         # na "eind speciaal" volgt normaal gesproken iets als "sublime weekend" of "candy's world", maar heet eerste stukje lijkt altijd hetzelfde
 
         nieuws_start = find_offset(recording_file, 'fragments/sublime_nieuws.wav')
-        weer_start = find_offset(recording_file, 'fragments/sublime_weer.wav')
+        weer_start = find_offset(recording_file, 'fragments/sublime_weer.wav', search_from=nieuws_start)
 
         # Nieuws is altijd hetzelfde, van "En nu het nieuws" tot "Sublime weer"
         if nieuws_start and weer_start:
             yield Segment(nieuws_start - 1.52, weer_start - 1.2)
 
         if weer_start:
-            verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav')
+            verkeer_start = find_offset(recording_file, 'fragments/sublime_verkeer.wav', search_from=weer_start)
             # Tijdens de spits is er verkeersinformatie
             # Dan gaat weer tot "Sublime verkeer"
             if verkeer_start:
@@ -97,25 +97,37 @@ class SublimeNewsProvider(NewsProvider):
                 yield Segment(weer_start + 0.05, eind_reclame - 1.35)
                 return
 
-            eind_funky = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav')
+            eind_funky = find_offset(recording_file, 'fragments/sublime_eind_funky_friday.wav', search_from=weer_start)
             if eind_funky:
                 yield Segment(weer_start + 0.05, eind_funky - 4.85)
                 return
 
-            eind_speciaal = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav')
+            eind_speciaal = find_offset(recording_file, 'fragments/sublime_eind_speciaal.wav', search_from=weer_start)
             if eind_speciaal:
                 yield Segment(weer_start + 0.05, eind_speciaal - 3.5)
                 return
 
             # hogere kans op verkeerde detectie dus wordt als laatste geprobeerd
-            eind_nacht = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav')
+            eind_nacht = find_offset(recording_file, 'fragments/sublime_eind_nacht.wav', search_from=weer_start)
             if eind_nacht:
                 yield Segment(weer_start + 0.05, eind_nacht - 5.3)
                 return
 
         # Eind is ook soms anders, dan maar geen weer. In ieder geval hebben we het nieuws.
 
-NEWS_PROVIDERS = {'sublime': SublimeNewsProvider()}
+
+class NpoRadio2NewsProvider(NewsProvider):
+    record_url = 'https://icecast.omroep.nl/radio2-bb-mp3'
+
+    def segments(self, recording_file: str) -> Iterator[Segment]:
+        nieuws_start = find_offset(recording_file, 'fragments/npo_radio2_nieuws.wav')
+        weer_start = find_offset(recording_file, 'fragments/npo_radio2_weer.wav', search_from=nieuws_start)
+        # nieuws einde is elke keer anders, dus we kunnen alleen maar tot het weer
+        yield Segment(nieuws_start + 0.1, weer_start - 0.07)
+
+
+NEWS_PROVIDERS = {'sublime': SublimeNewsProvider(),
+                  'npo-radio2': NpoRadio2NewsProvider()}
 
 
 class NewsScraper:
