@@ -67,7 +67,7 @@ class NewsProvider(ABC):
 
 
 class SublimeNewsProvider(NewsProvider):
-    record_url = 'https://22723.live.streamtheworld.com/SUBLIME.mp3'
+    record_url = 'https://playerservices.streamtheworld.com/api/livestream-redirect/SUBLIME.mp3'
 
     def segments(self, recording_file: str) -> Iterator[Segment]:
         # Voorbeeld werkdag overdag tijdens spits: reclame - start - weer - verkeer - eind_reclame - reclame
