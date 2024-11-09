@@ -36,7 +36,7 @@ def read_wav(file_name):
     return audio_as_np_float32 / 2**15, ifile.getframerate()
 
 
-def find_offset(within_file, find_file, search_from = 0.0):
+def find_offset(within_file, find_file, search_from = 0.0) -> float | None:
     y_within, sr_within = read_wav(within_file)
     y_find, _sr_find = read_wav(find_file)
     y_within = y_within[int(search_from*sr_within):]
@@ -47,7 +47,7 @@ def find_offset(within_file, find_file, search_from = 0.0):
     print(f'found {find_file} at {offset} with confidence {confidence}')
     if confidence < 0.8:
         return None
-    return offset
+    return float(offset)
 
 
 @dataclass
@@ -126,9 +126,11 @@ class NpoRadio2NewsProvider(NewsProvider):
 
     def segments(self, recording_file: str) -> Iterator[Segment]:
         nieuws_start = find_offset(recording_file, 'fragments/npo_radio2_nieuws.wav')
-        weer_start = find_offset(recording_file, 'fragments/npo_radio2_weer.wav', search_from=nieuws_start)
-        # nieuws einde is elke keer anders, dus we kunnen alleen maar tot het weer
-        yield Segment(nieuws_start + 0.1, weer_start - 0.07)
+        if nieuws_start:
+            weer_start = find_offset(recording_file, 'fragments/npo_radio2_weer.wav', search_from=nieuws_start)
+            if weer_start:
+                # nieuws einde is elke keer anders, dus we kunnen alleen maar tot het weer
+                yield Segment(nieuws_start + 0.1, weer_start - 0.07)
 
 
 NEWS_PROVIDERS = {'sublime': SublimeNewsProvider(),
