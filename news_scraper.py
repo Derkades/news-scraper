@@ -86,7 +86,12 @@ class SublimeNewsProvider(NewsProvider):
             # Tijdens de spits is er verkeersinformatie
             # Dan gaat weer tot "Sublime verkeer"
             if verkeer_start:
-                yield Segment(weer_start + 0.05, verkeer_start - 1.75)
+                yield Segment(weer_start + 0.1, verkeer_start - 1.75)
+                return
+
+            verkeer_start2 = find_offset(recording_file, 'fragments/sublime_verkeer2.wav', search_from=weer_start)
+            if verkeer_start2:
+                yield Segment(weer_start + 0.1, verkeer_start2 - 2.3)
                 return
 
             # anders gaat weer tot het eind, maar welk eind?
