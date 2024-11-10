@@ -59,7 +59,7 @@ class Segment:
 class NewsProvider(ABC):
     record_url: str
     record_start_minute = 57
-    record_duration = 7*60
+    record_duration = 9*60
 
     @abstractmethod
     def segments(self, recording_file: str) -> Iterator[Segment]:
