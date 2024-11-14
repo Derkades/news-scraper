@@ -138,6 +138,7 @@ NEWS_PROVIDERS = {'sublime': SublimeNewsProvider(),
 
 
 class NewsScraper:
+    MAX_NEWS_AGE = 7200
     workdir: Path
     news_path: Path
     recording_file: str
@@ -266,7 +267,7 @@ class NewsScraper:
                     self.wfile.write(b'news missing\n')
                     return
 
-                if outer_self.news_path.stat().st_mtime < time.time() - 3600:
+                if outer_self.news_path.stat().st_mtime < time.time() - outer_self.MAX_NEWS_AGE:
                     self.send_response(503) # Service Unavailable
                     self.end_headers()
                     self.wfile.write(b'news outdated\n')
