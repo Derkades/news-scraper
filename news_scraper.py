@@ -76,6 +76,8 @@ class SublimeNewsProvider(NewsProvider):
         # na "eind speciaal" volgt normaal gesproken iets als "sublime weekend" of "candy's world", maar heet eerste stukje lijkt altijd hetzelfde
 
         nieuws_start = find_offset(recording_file, 'fragments/sublime_nieuws2.wav')
+        if not nieuws_start:
+            return
         weer_start = find_offset(recording_file, 'fragments/sublime_weer2.wav', search_from=nieuws_start)
 
         # Nieuws is altijd hetzelfde, van "En nu het nieuws" tot "Sublime weer"
