@@ -1,4 +1,4 @@
 services:
   news:
     build: .
-    command: --http-bind 0.0.0.0 --provider sublime
+    command: --http-bind 0.0.0.0 --source sublime

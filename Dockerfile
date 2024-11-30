@@ -57,9 +57,10 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY news_scraper ./news_scraper
+COPY fragments ./fragments
 
 ENV PYTHONUNBUFFERED=1
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["python3", "-m", "news_scraper.py"]
+ENTRYPOINT ["python3", "-m", "news_scraper"]
