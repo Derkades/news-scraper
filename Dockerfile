@@ -56,11 +56,10 @@ COPY --from=build-ffmpeg /build/ffmpeg/ffmpeg /usr/local/bin/
 RUN mkdir /app
 WORKDIR /app
 
-COPY news_scraper.py .
-COPY fragments ./fragments
+COPY news_scraper ./news_scraper
 
 ENV PYTHONUNBUFFERED=1
 
 STOPSIGNAL SIGINT
 
-ENTRYPOINT ["python3", "news_scraper.py"]
+ENTRYPOINT ["python3", "-m", "news_scraper.py"]
