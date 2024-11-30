@@ -18,6 +18,7 @@ python3 -m news_scraper --source <source>
 
 ## News sources
 
+ * Radio Haarlem
  * NPO Radio 2
  * ~~Sublime~~
 
