@@ -6,7 +6,7 @@ from typing import override
 from news_scraper.scraper import NewsScraper
 
 
-_LOGGER = logging.getLogger()
+_LOGGER = logging.getLogger(__name__)
 
 
 class NewsServer(Thread):

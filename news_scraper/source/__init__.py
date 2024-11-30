@@ -1,3 +1,4 @@
+import logging
 import math
 import wave
 from abc import ABC, abstractmethod
@@ -7,6 +8,9 @@ from wave import Wave_read
 
 import numpy as np
 from scipy.signal import correlate
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 # https://stackoverflow.com/a/62298670/4833737
@@ -27,15 +31,23 @@ def read_wav(file_name: str):
     return audio_as_np_float32 / 2**15, ifile.getframerate()
 
 
-def find_offset(within_file: str, find_file: str, search_from: float = 0.0) -> float | None:
+def find_offset(
+    within_file: str, find_file: str, search_from: float = 0.0
+) -> float | None:
     y_within, sr_within = read_wav(within_file)
     y_find, _sr_find = read_wav(find_file)
-    y_within = y_within[int(search_from*sr_within):]
+    y_within = y_within[int(search_from * sr_within) :]
     c = correlate(y_within, y_find)
     peak = np.argmax(c)
     offset = round(peak / sr_within, 2) + search_from
     confidence = float((c[peak] / len(y_find)) * 100)
-    print(f'found {find_file} at {offset}s {math.floor(offset / 60)}:{round(offset % 60)} with confidence {confidence}')
+    _LOGGER.info(
+        "found %s at %s:%s with confidence %s",
+        find_file,
+        math.floor(offset / 60),
+        round(offset % 60),
+        confidence,
+    )
     if confidence < 0.8:
         return None
     return float(offset)

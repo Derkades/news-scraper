@@ -8,7 +8,7 @@ from typing import override
 
 from news_scraper.source import NewsSource
 
-_LOGGER = logging.getLogger()
+_LOGGER = logging.getLogger(__name__)
 
 class NewsScraper(Thread):
     MAX_NEWS_AGE: int = 7200
