@@ -31,10 +31,11 @@ class NewsScraper(Thread):
         self.last_activation = 0
 
     def record_stream(self):
-        subprocess.check_call(
+        _ = subprocess.check_call(
             [
                 "ffmpeg",
                 "-hide_banner",
+                "-nostats",
                 "-nostdin",
                 "-y",  # overwrite
                 "-i",
@@ -62,11 +63,12 @@ class NewsScraper(Thread):
         for i, segment in enumerate(self.source.segments(self.recording_file)):
             _LOGGER.info("extracting audio %s %s", i, segment)
             segment_file = Path(self.workdir, f"segment{i}.wav")
-            subprocess.check_call(
+            _ = subprocess.check_call(
                 [
                     "ffmpeg",
-                    "-nostdin",
                     "-hide_banner",
+                    "-nostats",
+                    "-nostdin",
                     "-y",
                     "-i",
                     self.recording_file,
@@ -86,15 +88,16 @@ class NewsScraper(Thread):
 
         _LOGGER.info("joining segments")
         list_file = Path(self.workdir, "list.txt")
-        list_file.write_text(
+        _ = list_file.write_text(
             "\n".join([f"file '{file.as_posix()}'" for file in segment_files]),
             encoding="utf-8",
         )
 
-        subprocess.check_call(
+        _ = subprocess.check_call(
             [
                 "ffmpeg",
                 "-hide_banner",
+                "-nostats",
                 "-nostdin",
                 "-y",
                 "-f",
