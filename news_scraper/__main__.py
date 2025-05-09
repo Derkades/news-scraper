@@ -9,13 +9,15 @@ from typing import Never, cast
 from news_scraper.scraper import NewsScraper
 from news_scraper.server import NewsServer
 from news_scraper.source.haarlem import RadioHaarlemNewsSource
+from news_scraper.source.kink import KinkNewsSource
 from news_scraper.source.npo2 import NPO2NewsSource
 from news_scraper.source.sublime import SublimeNewsSource
 
 NEWS_SOURCES = {
-    "sublime": SublimeNewsSource(),
-    "npo-radio2": NPO2NewsSource(),
     "haarlem": RadioHaarlemNewsSource(),
+    "kink": KinkNewsSource(),
+    "npo-radio2": NPO2NewsSource(),
+    "sublime": SublimeNewsSource(),
 }
 
 def main() -> Never:
