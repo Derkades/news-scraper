@@ -28,10 +28,10 @@ News can be downloaded by making a GET request to `/news.wav`. It is returned in
 
 ## Development
 
-To debug a specific recording, obtain it from /tmp. For example: `/tmp/news-scraper-__adqoey/recording.wav`.
+To debug a specific recording, obtain it from /tmp. For example: `/tmp/news-scraper-__adqoey/recording.wav`. Or manually create a recording using `ffmpeg -i https://... -ac 1 -channel_layout mono recording.wav`.
 
 If you are using docker, you can do this using `docker exec news ls /tmp` to find the directory name, followed by `docker cp news:/tmp/news-scraper-__adqoey .`
 
-You can now run the news scraper on this specific recording: `python3 news_scraper.py --provider ... --force-recording recording.wav --persistent`.
+You can now run the news scraper on this specific recording: `python3 -m news_scraper --source ... --force-recording recording.wav --persistent`.
 
 The `--persistent` flag causes the program to place the resulting news audio in `./data` instead of in temporary storage.
