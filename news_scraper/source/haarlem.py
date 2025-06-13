@@ -6,7 +6,7 @@ from news_scraper.source import NewsSource, Segment, find_offset
 
 class RadioHaarlemNewsSource(NewsSource):
     def __init__(self):
-        super().__init__(record_url = 'http://live.radiohaarlem.nl:8000/radio.mp3')
+        super().__init__('Radionieuws', record_url = 'http://live.radiohaarlem.nl:8000/radio.mp3')
 
     @override
     def segments(self, recording_file: str) -> Iterator[Segment]:

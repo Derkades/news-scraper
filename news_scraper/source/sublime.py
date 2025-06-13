@@ -7,6 +7,7 @@ from news_scraper.source import NewsSource, Segment, find_offset
 class SublimeNewsSource(NewsSource):
     def __init__(self):
         super().__init__(
+            'ANP Nieuws',
             record_url="https://playerservices.streamtheworld.com/api/livestream-redirect/SUBLIME.mp3"
         )
 

@@ -35,6 +35,7 @@ class NewsServer(Thread):
                     self.send_header('Content-Type', 'audio/wav')
                     self.send_header('Content-Disposition', 'attachment; filename="news.wav"')
                     self.send_header('Content-Length', str(len(news)))
+                    self.send_header('X-Name', scraper.source.name)
                     self.end_headers()
                     self.wfile.write(news)
                 else:

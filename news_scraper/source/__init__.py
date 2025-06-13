@@ -1,5 +1,6 @@
 import logging
 import math
+from typing import cast
 import wave
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
@@ -19,7 +20,7 @@ def read_wav(file_name: str):
     Read wave file as float array normalized -1.0 to 1.0
     """
     # Read file to get buffer
-    ifile: Wave_read = wave.open(file_name)
+    ifile = cast(Wave_read, wave.open(file_name))
     samples = ifile.getnframes()
     audio = ifile.readframes(samples)
 
@@ -60,17 +61,20 @@ class Segment:
 
 
 class NewsSource(ABC):
+    name: str
     record_url: str
     record_start_minute: int
     record_duration: int
 
     def __init__(
         self,
+        name: str,
         *,
         record_url: str,
         record_start_minute: int = 57,
         record_duration: int = 9 * 60,
     ):
+        self.name = name
         self.record_url = record_url
         self.record_start_minute = record_start_minute
         self.record_duration = record_duration

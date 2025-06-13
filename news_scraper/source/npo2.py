@@ -6,7 +6,7 @@ from news_scraper.source import NewsSource, Segment, find_offset
 
 class NPO2NewsSource(NewsSource):
     def __init__(self):
-        super().__init__(record_url = 'https://icecast.omroep.nl/radio2-bb-mp3')
+        super().__init__('NOS Nieuws', record_url = 'https://icecast.omroep.nl/radio2-bb-mp3')
 
     @override
     def segments(self, recording_file: str) -> Iterator[Segment]:
