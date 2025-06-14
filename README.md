@@ -19,8 +19,9 @@ python3 -m news_scraper --source <source>
 ## News sources
 
  * Radio Haarlem
+ * Kink (Recommended)
  * NPO Radio 2
- * ~~Sublime~~
+ * ~~Sublime (Broken)~~
 
 ## API Usage
 
