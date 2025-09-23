@@ -1,15 +1,15 @@
-FROM python:3.13-slim AS base
+FROM docker.io/python:3.13-slim AS base
 
 FROM base AS build-ffmpeg
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential wget bzip2 nasm pkg-config libssl-dev
+    apt-get install -y --no-install-recommends build-essential wget bzip2 nasm pkg-config libssl-dev xz-utils
 
-RUN mkdir /build
-
-RUN cd /build && \
-    wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2 && \
-    tar xjf ffmpeg-snapshot.tar.bz2
+RUN mkdir /build && \
+    cd /build && \
+    wget -O ffmpeg.tar.xz https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz && \
+    tar xf ffmpeg.tar.xz && \
+    mv ffmpeg-* ffmpeg
 
 RUN cd /build/ffmpeg && \
     ./configure \
@@ -34,6 +34,7 @@ RUN cd /build/ffmpeg && \
         --enable-protocol=file \
         --enable-protocol=http \
         --enable-protocol=https \
+        --enable-protocol=udp \
         --enable-decoder=mp3 \
         --enable-decoder=pcm_s16le \
         --enable-demuxer=mp3 \
