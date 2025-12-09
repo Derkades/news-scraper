@@ -1,4 +1,4 @@
-FROM docker.io/python:3.13-slim AS base
+FROM docker.io/python:3.14-slim AS base
 
 FROM base AS build-ffmpeg
 
