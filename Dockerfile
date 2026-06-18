@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 RUN mkdir /build && \
     cd /build && \
-    wget -O ffmpeg.tar.xz https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz && \
+    wget -O ffmpeg.tar.xz https://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz && \
     tar xf ffmpeg.tar.xz && \
     mv ffmpeg-* ffmpeg
 
